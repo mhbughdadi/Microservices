@@ -1,6 +1,6 @@
 package com.apogee.product.controllers;
 
-import com.apogee.product.dto.ProductDto;
+import com.apogee.product.dtos.inputs.ProductDto;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
