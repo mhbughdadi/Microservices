@@ -9,5 +9,5 @@ import java.util.List;
 @Setter
 @Getter
 public class AllProductsResponseDto extends SuccessfulResponse{
-    List<ProductDto> products;
+    private List<ProductDto> products;
 }

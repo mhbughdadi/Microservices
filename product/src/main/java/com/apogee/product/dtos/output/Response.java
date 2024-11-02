@@ -8,10 +8,10 @@ import java.util.Date;
 @Getter
 @Setter
 public class Response {
-    int code;
-    ErrorMessage error;
-    Date timeStamp = new Date();
-    Status status;
+    private int code;
+    private ErrorMessage error;
+    private Date timeStamp = new Date();
+    private Status status;
 
     public Response( int code, Status status){
         this.code = code;
