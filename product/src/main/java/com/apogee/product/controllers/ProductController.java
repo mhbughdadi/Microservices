@@ -2,6 +2,7 @@ package com.apogee.product.controllers;
 
 import com.apogee.product.backingService.ProductsBackingService;
 import com.apogee.product.dtos.inputs.ProductDto;
+import com.apogee.product.dtos.output.AddProductResponseDto;
 import com.apogee.product.dtos.output.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,9 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto addProduct(@RequestBody ProductDto product){
-
-    return product;
+    public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody ProductDto product){
+        AddProductResponseDto response = productsBackingService.addProduct(product);
+    return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.PUT)

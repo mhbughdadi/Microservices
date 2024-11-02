@@ -17,6 +17,8 @@
 	<properties>
 		<java.version>23</java.version>
 		<lombok.version>1.18.30</lombok.version>
+		<dozer.version>7.0.0</dozer.version>
+
 
 	</properties>
 	<url/>
@@ -62,6 +64,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.dozermapper</groupId>
+			<artifactId>dozer-core</artifactId>
+			<version>${dozer.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
