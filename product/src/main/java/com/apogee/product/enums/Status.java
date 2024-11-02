@@ -4,7 +4,8 @@ public enum Status {
     SUCCESS("0"),
     FAILURE("-1");
 
-    private String code;
+    private final String code;
+
     Status ( String code){
         this.code = code;
     }
