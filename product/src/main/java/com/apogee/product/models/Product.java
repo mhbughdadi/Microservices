@@ -1,6 +1,5 @@
 package com.apogee.product.models;
 
-import com.apogee.product.entities.ImageEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +15,5 @@ public class Product {
     private String description;
     private Date productionDate;
     private Date expireDate;
-    private ImageEntity image;
+    private Image image;
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class AllProductsResponseDto extends SuccessfulResponse{
+public class AllProductsResponseDto extends SuccessfulResponse {
+
     private List<ProductDto> products;
 }

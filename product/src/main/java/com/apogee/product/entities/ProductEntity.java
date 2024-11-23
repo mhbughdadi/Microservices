@@ -25,7 +25,7 @@ public class ProductEntity {
     private Date productionDate;
     private Date expireDate;
     @OneToOne
-    @JoinColumn(name = "imageId",referencedColumnName = "imageId",insertable = true)
+    @JoinColumn(name = "imageId",referencedColumnName = "imageId",insertable = false)
     private ImageEntity image;
 
 }

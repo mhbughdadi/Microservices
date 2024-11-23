@@ -9,34 +9,40 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 @RestController
-@RequestMapping(path= "/products")
 public class ProductController {
 
     @Autowired private ProductsBackingService productsBackingService;
 
-    @GetMapping
-    public ResponseEntity<Response> allProducts(){
-    return new ResponseEntity<>(productsBackingService.getAllProducts(),HttpStatus.OK);
+    @GetMapping("/products")
+    public ResponseEntity<Response> allProducts() throws InvocationTargetException, InstantiationException,
+            IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
+
+        return new ResponseEntity<>(productsBackingService.getAllProducts(),HttpStatus.OK);
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/products/{productId}")
     public void findProduct(@PathVariable("productId") Long productId){
 
     }
 
-    @PostMapping
-    public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody ProductDto product){
+    @PostMapping("/products")
+    public ResponseEntity<AddProductResponseDto> addProduct(@RequestBody ProductDto product) throws InvocationTargetException,
+            InstantiationException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
+
         AddProductResponseDto response = productsBackingService.addProduct(product);
-    return new ResponseEntity<>(response,HttpStatus.CREATED);
+
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, value = "/products")
     public void updateProduct(@RequestBody Object product){
 
     }
 
-    @RequestMapping(method = RequestMethod.DELETE,value = "/{productId}")
+    @RequestMapping(method = RequestMethod.DELETE,value = "/products/{productId}")
     public void deleteProduct (@PathVariable("productId") Long productId){
 
     }

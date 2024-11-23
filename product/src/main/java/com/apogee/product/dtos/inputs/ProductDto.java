@@ -1,6 +1,19 @@
 package com.apogee.product.dtos.inputs;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
-public record ProductDto(String productId, String shortName, String longName, String description, Date productionDate, Date expireDate, ImageInfo image) {
+@Setter
+@Getter
+public class ProductDto{
+
+    private Long productId;
+    private String shortName;
+    private String longName;
+    private String description;
+    private Date productionDate;
+    private Date expireDate;
+    private ImageInfo image;
 }

@@ -16,5 +16,5 @@ public class AddProductResponseDto extends SuccessfulResponse{
     private String description;
     private Date productionDate;
     private Date expireDate;
-    private ImageEntity image;
+    private ImageDto image;
 }

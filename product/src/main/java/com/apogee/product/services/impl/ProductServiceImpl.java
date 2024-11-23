@@ -4,8 +4,8 @@ import com.apogee.product.entities.ProductEntity;
 import com.apogee.product.models.Product;
 import com.apogee.product.repositories.ProductRepository;
 import com.apogee.product.services.ProductService;
-import com.github.dozermapper.core.Mapper;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Collections;
@@ -17,9 +17,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    private final ModelMapper mapper;
 
-    @Autowired
-    Mapper mapper;
+
+    public ProductServiceImpl(){
+        this.mapper = new ModelMapper();
+    }
 
     @Override
     public List<Product> findAllProducts() {
@@ -34,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product addProduct(Product product) {
         System.out.println(product.getShortName()+product.getLongName());
+
         ProductEntity savedEntity =  productRepository.save(mapper.map(product,ProductEntity.class));
         return mapper.map(savedEntity,Product.class);
     }
