@@ -49,7 +49,7 @@ public class MapperImpl implements  Mapper{
                     destinationField.set(destinationObj,sourceValue);
                 }else if(Collection.class.isAssignableFrom(source.getClass())){
 
-                   destinationField.set(destinationObj, mapCollection(sourceValue, destinationField, destinationObj));
+                   destinationField.set(destinationObj, mapCollection(sourceValue, destinationField));
 
                 }else {
 
@@ -64,7 +64,14 @@ public class MapperImpl implements  Mapper{
         return destinationObj;
     }
 
-    private <D> Collection<Object> mapCollection(Object sourceValue, Field destinationField, D destinationObj) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    /**
+     * this method is designed to map collection of some generic type to a collection of the distinction generic type.
+     * @param sourceValue the source collection value.
+     * @param destinationField the same name field in the destination class.
+     * @return collection of object, because every class is subclass of object class.
+     * @throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException
+     */
+    private Collection<Object> mapCollection(Object sourceValue, Field destinationField) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         if(sourceValue != null){
 
             Collection<?> sourceValueCollection = (Collection<?>) sourceValue;
@@ -80,9 +87,14 @@ public class MapperImpl implements  Mapper{
         return null;
     }
 
-    private Class<?> getGenericType(Field destinationField) {
+    /**
+     * getting the class type of the parameterized types (collections).
+     * @param targetField the parameterized ( collection) to get its class type.
+     * @return the generic class of the parameterized input class.
+     */
+    private Class<?> getGenericType(Field targetField) {
 
-        Type type = destinationField.getGenericType();
+        Type type = targetField.getGenericType();
 
         if(type instanceof ParameterizedType parameterizedType){
 
@@ -92,6 +104,11 @@ public class MapperImpl implements  Mapper{
         return Object.class;
     }
 
+    /**
+     * this method creates an object of the same class passed as a parameter.
+     * @param type target class type.
+     * @return collection of object type.
+     */
     private Collection<Object> createCollectionInstance(Class<?> type) {
 
         if(List.class.isAssignableFrom(type)){
@@ -106,6 +123,12 @@ public class MapperImpl implements  Mapper{
         }
     }
 
+    /**
+     * checks the simple types which will not needed to converted.
+     * if the input type is one of the listed down classes it will not get converted , just assign it to the target
+     * @param sourceClass the class we need to check.
+     * @return boolean true, or false.
+     */
     private boolean isSimpleField(Class<?> sourceClass) {
         return sourceClass.isPrimitive()
                 || sourceClass == String.class

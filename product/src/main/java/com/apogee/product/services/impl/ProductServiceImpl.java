@@ -36,7 +36,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product addProduct(Product product) {
-        System.out.println(product.getShortName()+product.getLongName());
 
         ProductEntity savedEntity =  productRepository.save(mapper.map(product,ProductEntity.class));
         return mapper.map(savedEntity,Product.class);
