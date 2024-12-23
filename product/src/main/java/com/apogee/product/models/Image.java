@@ -6,9 +6,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Image {
+
     private Long imageId;
     private String largeScreen;
     private String smallScreen;
     private String mediumScreen;
-    private Long productId;
+    private Product product;
 }

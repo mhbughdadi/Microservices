@@ -55,10 +55,17 @@ public class ProductsBackingService {
 
         Product product = mapper.map(productDto, Product.class);
 
-        List<Image> savedImages = this.imageService.saveImages(product.getImages());
-        product.setImages(savedImages);
-
         Product savedProduct = productService.addProduct(product);
+
+        if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()){
+            product.getImages().forEach(image-> image.setProduct(savedProduct));
+        }
+
+        List<Image> savedImages = this.imageService.saveImages(product.getImages());
+        if(savedProduct != null) {
+
+            savedProduct.setImages(savedImages);
+        }
 
         response = mapper.map(savedProduct, AddProductResponseDto.class);
 
