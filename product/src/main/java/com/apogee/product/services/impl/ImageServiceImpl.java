@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+import static com.apogee.product.utilities.Utilities.transformCollection;
+
 @Service
 @Transactional
 public class ImageServiceImpl implements ImageService {
@@ -21,28 +23,28 @@ public class ImageServiceImpl implements ImageService {
     private final ModelMapper mapper;
 
 
-    public ImageServiceImpl(){
+    public ImageServiceImpl() {
         this.mapper = new ModelMapper();
     }
 
     @Override
     public List<Image> findAllImages() {
 
-      List<ImageEntity> imageEntities = imageRepository.findAll();
+        List<ImageEntity> imageEntities = imageRepository.findAll();
 
-      if(!imageEntities.isEmpty()){
-          return imageEntities.stream().map(entity-> mapper.map(entity,Image.class)).toList();
-      }else{
-          return Collections.emptyList();
-      }
+        if (!imageEntities.isEmpty()) {
+            return imageEntities.stream().map(entity -> mapper.map(entity, Image.class)).toList();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
-    public Image addImage(Image image) {
+    public List<Image> saveImages(List<Image> images) throws Exception {
 
-        ImageEntity savedEntity =  imageRepository.save(mapper.map(image,ImageEntity.class));
+        List<ImageEntity> savedEntities = imageRepository.saveAll(transformCollection(images, (image) -> mapper.map(image, ImageEntity.class)));
 
-        return mapper.map(savedEntity,Image.class);
+        return transformCollection(savedEntities, (savedEntity) -> mapper.map(savedEntity, Image.class));
     }
 
 }

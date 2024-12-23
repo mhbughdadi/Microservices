@@ -10,4 +10,5 @@ public class Image {
     private String largeScreen;
     private String smallScreen;
     private String mediumScreen;
+    private Long productId;
 }

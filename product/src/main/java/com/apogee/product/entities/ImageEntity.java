@@ -3,7 +3,8 @@ package com.apogee.product.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ public class ImageEntity {
     private String largeScreen;
     private String smallScreen;
     private String mediumScreen;
-    @OneToOne(mappedBy = "image")
+    @ManyToOne
+    @JoinColumn(name = "productId", referencedColumnName = "productId", insertable = false)
     private ProductEntity product;
 }

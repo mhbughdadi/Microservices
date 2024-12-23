@@ -4,11 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Setter
@@ -17,15 +17,15 @@ import java.util.Date;
 public class ProductEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long productId;
     private String shortName;
     private String longName;
     private String description;
     private Date productionDate;
     private Date expireDate;
-    @OneToOne
-    @JoinColumn(name = "imageId",referencedColumnName = "imageId",insertable = false)
-    private ImageEntity image;
+
+    @OneToMany(mappedBy = "product")
+    private ArrayList<ImageEntity> images;
 
 }

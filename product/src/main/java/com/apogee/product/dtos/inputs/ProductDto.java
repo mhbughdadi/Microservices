@@ -3,6 +3,7 @@ package com.apogee.product.dtos.inputs;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Setter
@@ -15,5 +16,5 @@ public class ProductDto{
     private String description;
     private Date productionDate;
     private Date expireDate;
-    private ImageInfo image;
+    private ArrayList<ImageInfo> images;
 }
