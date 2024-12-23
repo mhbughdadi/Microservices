@@ -11,10 +11,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
+
+    Logger logger = Logger.getLogger(ProductService.class.getName());
 
     @Autowired
     private ProductRepository productRepository;
@@ -38,7 +44,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product addProduct(Product product) {
 
-        ProductEntity savedEntity = productRepository.save(mapper.map(product, ProductEntity.class));
+        ProductEntity transientProduct = mapper.map(product, ProductEntity.class);
+        logger.log(Level.SEVERE, formatAsJsonObject(transientProduct));
+
+        ProductEntity savedEntity = productRepository.save(transientProduct);
         return mapper.map(savedEntity, Product.class);
     }
 }
