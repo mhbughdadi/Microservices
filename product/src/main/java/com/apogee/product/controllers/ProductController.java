@@ -3,6 +3,8 @@ package com.apogee.product.controllers;
 import com.apogee.product.backingService.ProductsBackingService;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.dtos.output.AddProductResponseDto;
+import com.apogee.product.dtos.output.AllProductsResponseDto;
+import com.apogee.product.dtos.output.FindProductResponseDto;
 import com.apogee.product.dtos.output.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,12 +26,17 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<Response> allProducts() throws Exception {
 
-        return new ResponseEntity<>(productsBackingService.getAllProducts(), HttpStatus.OK);
+        AllProductsResponseDto response = productsBackingService.getAllProducts();
+
+        return new ResponseEntity<>( response , HttpStatus.OK);
     }
 
     @GetMapping("/products/{productId}")
-    public void findProduct(@PathVariable("productId") Long productId) {
+    public ResponseEntity<Response> findProduct(@PathVariable("productId") Long productId) throws Exception{
 
+        FindProductResponseDto response = productsBackingService.getProductById(productId);
+
+        return new ResponseEntity<>( response , HttpStatus.OK);
     }
 
     @PostMapping("/products")

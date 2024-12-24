@@ -1,12 +1,13 @@
 package com.apogee.product.dtos.output;
 
+
 import com.apogee.product.dtos.inputs.ProductDto;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public class AddProductResponseDto extends SuccessfulResponse {
+public class FindProductResponseDto extends SuccessfulResponse {
 
-    private ProductOutputDto product;
+    ProductOutputDto product;
 }

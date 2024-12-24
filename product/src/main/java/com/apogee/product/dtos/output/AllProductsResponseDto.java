@@ -10,5 +10,5 @@ import java.util.List;
 @Getter
 public class AllProductsResponseDto extends SuccessfulResponse {
 
-    private List<ProductDto> products;
+    private List<ProductOutputDto> products;
 }

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,5 +51,16 @@ public class ProductServiceImpl implements ProductService {
 
         ProductEntity savedEntity = productRepository.save(transientProduct);
         return mapper.map(savedEntity, Product.class);
+    }
+
+    @Override
+    public Product findProductById(Long productId) {
+
+        AtomicReference<Product> productReference = new AtomicReference<>();
+        Optional<ProductEntity> productEntityOptional = this.productRepository.findById(productId);
+
+        productEntityOptional.ifPresent(productEntity -> productReference.set( mapper.map(productEntity,Product.class)));
+
+        return productReference.get();
     }
 }

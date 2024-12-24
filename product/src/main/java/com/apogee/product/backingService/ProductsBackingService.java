@@ -1,5 +1,7 @@
 package com.apogee.product.backingService;
 
+import com.apogee.product.dtos.output.FindProductResponseDto;
+import com.apogee.product.dtos.output.ProductOutputDto;
 import com.apogee.product.mappings.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
 import com.apogee.product.dtos.output.AddProductResponseDto;
@@ -13,63 +15,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Service
 public class ProductsBackingService {
 
+    Logger logger = Logger.getLogger(ProductsBackingService.class.getName());
+
     @Autowired
     private ProductService productService;
+
     @Autowired
     private ImageService imageService;
+
     @Autowired
     private Mapper mapper;
 
-    public ProductsBackingService() {
-    }
 
-    /**
-     * Retrieves all products from the product service and maps them to ProductDto objects.
-     *
-     * @return AllProductsResponseDto containing a list of all products.
-     */
     public AllProductsResponseDto getAllProducts() throws Exception {
 
         AllProductsResponseDto response = new AllProductsResponseDto();
 
-        List<ProductDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), (product) -> mapper.map(product, ProductDto.class));
+        List<ProductOutputDto> allProducts = Utilities.transformCollection(productService.findAllProducts(), (product) -> mapper.map(product, ProductOutputDto.class));
         response.setProducts(allProducts);
 
         return response;
     }
 
-    /**
-     * Maps a ProductDto object to a Product object and calls the addProduct method on the product service with it.
-     * Also maps the saved product back to an AddProductResponseDto object.
-     *
-     * @param productDto A ProductDto containing the product information.
-     * @return AddProductResponseDto containing the saved product information.
-     */
     public AddProductResponseDto addProduct(ProductDto productDto) throws Exception {
 
-        AddProductResponseDto response;
+        AddProductResponseDto response = new AddProductResponseDto();
 
         Product product = mapper.map(productDto, Product.class);
-
         Product savedProduct = productService.addProduct(product);
+        logger.log(Level.SEVERE, "transient product: " + formatAsJsonObject(product));
 
         if (savedProduct != null && product.getImages() != null && !product.getImages().isEmpty()){
+
             product.getImages().forEach(image-> image.setProduct(savedProduct));
-        }
-
-        List<Image> savedImages = this.imageService.saveImages(product.getImages());
-        if(savedProduct != null) {
-
+            List<Image> savedImages = this.imageService.saveImages(product.getImages());
             savedProduct.setImages(savedImages);
         }
+        logger.log(Level.SEVERE, "Saved product: " + formatAsJsonObject(savedProduct));
 
-        response = mapper.map(savedProduct, AddProductResponseDto.class);
+        response .setProduct(mapper.map(savedProduct, ProductOutputDto.class));
 
         return response;
 
+    }
+
+    public FindProductResponseDto getProductById(Long productId) throws Exception{
+
+        FindProductResponseDto response = new FindProductResponseDto();
+
+        Product product = productService.findProductById(productId);
+        response.setProduct(mapper.map(product,ProductOutputDto.class));
+
+        return response;
     }
 }

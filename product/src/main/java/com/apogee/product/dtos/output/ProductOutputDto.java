@@ -1,4 +1,4 @@
-package com.apogee.product.dtos.inputs;
+package com.apogee.product.dtos.output;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ProductDto{
+public class ProductOutputDto{
 
     private Long productId;
     private String shortName;
@@ -16,5 +16,5 @@ public class ProductDto{
     private String description;
     private Date productionDate;
     private Date expireDate;
-    private List<ImageInfo> images;
+    private List<ImageDto> images;
 }
