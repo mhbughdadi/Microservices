@@ -42,7 +42,7 @@ public class MapperImpl implements Mapper {
                 Field destinationField = destinationObj.getClass().getDeclaredField(sourceField.getName());
                 destinationField.setAccessible(true);
 
-                if (isSimpleField(sourceField.getType()) || sourceField.getType().isAssignableFrom(destinationField.getType())) {
+                if (isSimpleField(sourceField.getType())) {
 
                     destinationField.set(destinationObj, sourceValue);
                 } else if (Collection.class.isAssignableFrom(sourceField.getType())) {
