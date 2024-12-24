@@ -1,11 +1,11 @@
 package com.apogee.product.services.impl;
 
 import com.apogee.product.entities.ProductEntity;
+import com.apogee.product.mappings.Mapper;
 import com.apogee.product.models.Product;
 import com.apogee.product.repositories.ProductRepository;
 import com.apogee.product.services.ProductService;
 import jakarta.transaction.Transactional;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
+import static com.apogee.product.utilities.Utilities.transformCollection;
 
 @Service
 @Transactional
@@ -26,25 +27,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
-    private final ModelMapper mapper;
 
-
-    public ProductServiceImpl() {
-        this.mapper = new ModelMapper();
-    }
+    @Autowired
+    Mapper mapper;
 
     @Override
-    public List<Product> findAllProducts() {
+    public List<Product> findAllProducts() throws Exception {
         List<ProductEntity> productEntities = productRepository.findAll();
         if (!productEntities.isEmpty()) {
-            return productEntities.stream().map(entity -> mapper.map(entity, Product.class)).toList();
+            return transformCollection(productEntities, entity -> mapper.map(entity, Product.class));
         } else {
             return Collections.emptyList();
         }
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(Product product) throws Exception {
 
         ProductEntity transientProduct = mapper.map(product, ProductEntity.class);
         logger.log(Level.SEVERE, formatAsJsonObject(transientProduct));
@@ -54,12 +52,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findProductById(Long productId) {
+    public Product findProductById(Long productId) throws Exception {
 
         AtomicReference<Product> productReference = new AtomicReference<>();
         Optional<ProductEntity> productEntityOptional = this.productRepository.findById(productId);
 
-        productEntityOptional.ifPresent(productEntity -> productReference.set( mapper.map(productEntity,Product.class)));
+        productEntityOptional.ifPresent(productEntity -> {
+            try {
+                productReference.set(mapper.map(productEntity, Product.class));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         return productReference.get();
     }

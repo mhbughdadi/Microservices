@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<Product> findAllProducts();
+    List<Product> findAllProducts() throws Exception;
 
-    Product addProduct(Product product);
+    Product addProduct(Product product) throws Exception;
 
-    Product findProductById(Long productId);
+    Product findProductById(Long productId) throws Exception;
 }
