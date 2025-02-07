@@ -11,4 +11,6 @@ public interface ProductService {
     Product addProduct(Product product) throws Exception;
 
     Product findProductById(Long productId) throws Exception;
+
+    void deleteProductById(Long productId) throws Exception;
 }

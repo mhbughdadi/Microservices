@@ -1,20 +1,19 @@
 package com.apogee.product.backingService;
 
-import com.apogee.product.dtos.output.FindProductResponseDto;
-import com.apogee.product.dtos.output.ProductOutputDto;
+import com.apogee.product.dtos.output.*;
 import com.apogee.product.mappings.Mapper;
 import com.apogee.product.dtos.inputs.ProductDto;
-import com.apogee.product.dtos.output.AddProductResponseDto;
-import com.apogee.product.dtos.output.AllProductsResponseDto;
 import com.apogee.product.models.Image;
 import com.apogee.product.models.Product;
 import com.apogee.product.services.ImageService;
 import com.apogee.product.services.ProductService;
 import com.apogee.product.utilities.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +32,9 @@ public class ProductsBackingService {
 
     @Autowired
     private Mapper mapper;
+
+    @Autowired
+    ResourceBundleMessageSource messageSource;
 
 
     public AllProductsResponseDto getAllProducts() throws Exception {
@@ -75,5 +77,17 @@ public class ProductsBackingService {
         response.setProduct(mapper.map(product,ProductOutputDto.class));
 
         return response;
+    }
+
+    public void deleteProduct(Long productId) throws Exception{
+
+         this.productService.deleteProductById(productId);
+    }
+
+    public Response updateProduct(Object product) {
+
+        return new FailureResponse(
+                messageSource.getMessage("product.error.method.not.implemented",null,Locale.getDefault()),
+                messageSource.getMessage("product.error.method.not.implemented",null,Locale.of("ar")) );
     }
 }

@@ -67,4 +67,12 @@ public class ProductServiceImpl implements ProductService {
 
         return productReference.get();
     }
+
+    @Override
+    public void deleteProductById(Long productId) throws Exception {
+
+        this.productRepository.deleteById(productId);
+    }
+
+
 }
