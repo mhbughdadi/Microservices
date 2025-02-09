@@ -28,7 +28,6 @@ public class LoggerAspect {
 
     Logger logger = Logger.getLogger(LoggerAspect.class.getName());
 
-
     @Before("execution(* com.apogee.product.controllers.ProductController.*(..))")
     void before(JoinPoint joinPoint) {
 
@@ -87,7 +86,6 @@ public class LoggerAspect {
         }
 
         return formatAsJsonObject(pathVariables);
-
     }
 
     private Map<String, String> getQueryParams(HttpServletRequest request) {
@@ -100,12 +98,15 @@ public class LoggerAspect {
     }
 
     private Map<String, String> getHeaders(HttpServletRequest request) {
+
         Map<String, String> headers = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
+
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
             headers.put(headerName, request.getHeader(headerName));
         }
+
         return headers;
     }
 
@@ -120,6 +121,7 @@ public class LoggerAspect {
                 }
             }
         }
+
         return null;
     }
 
