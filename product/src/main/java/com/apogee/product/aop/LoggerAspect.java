@@ -1,7 +1,9 @@
 package com.apogee.product.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -13,13 +15,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
+import static com.apogee.product.utilities.DateUtilities.getCurrentTimeStamp;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 
 @Aspect
@@ -29,18 +29,23 @@ public class LoggerAspect {
     Logger logger = Logger.getLogger(LoggerAspect.class.getName());
 
     @Before("execution(* com.apogee.product.controllers.ProductController.*(..))")
-    void before(JoinPoint joinPoint) {
+    void logRequestInformation(JoinPoint joinPoint) {
 
         logger = Logger.getLogger(joinPoint.getSignature().getDeclaringTypeName());
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String requestId = getUUID();
+
+        HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(request);
+        request.setAttribute("requestId", requestId);
 
         logger.log(Level.INFO, "URL: " + request.getRequestURL());
         logger.log(Level.INFO, "HTTP Method: " + request.getMethod());
-        logger.log(Level.INFO, "Timestamp: " + this.getCurrentTimeStamp());
+        logger.log(Level.INFO, "Timestamp: " + getCurrentTimeStamp());
         logger.log(Level.INFO, "Session ID: " + request.getRequestedSessionId());
         logger.log(Level.INFO, "Path Variables: " + getPathVariables(joinPoint));
         logger.log(Level.INFO, "Query Parameters: " + getQueryParams(request));
         logger.log(Level.INFO, "Headers: " + getHeaders(request));
+        logger.log(Level.INFO, "Request ID: " + requestId);
 
         // Log request body if present
         if (joinPoint.getArgs().length > 0) {
@@ -49,16 +54,31 @@ public class LoggerAspect {
 
     }
 
-    private String getCurrentTimeStamp() {
+    @AfterReturning(pointcut = "execution(* com.apogee.product.controllers..*(..))", returning = "response")
+    public void logResponseDetails(JoinPoint joinPoint, Object response) {
 
-        LocalDateTime now = LocalDateTime.now();
+        logger = Logger.getLogger(joinPoint.getSignature().getDeclaringTypeName());
 
-        // Define the desired format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String requestId = (String) request.getAttribute("requestId");
 
-        // Format the timestamp
-        return now.format(formatter);
+        logger.log(Level.INFO, "URL: " + request.getRequestURL());
+        logger.log(Level.INFO, "HTTP Method: " + request.getMethod());
+        logger.log(Level.INFO, "Timestamp: " + getCurrentTimeStamp());
+        logger.log(Level.INFO, "Session ID: " + request.getRequestedSessionId());
+        logger.log(Level.INFO, "Path Variables: " + getPathVariables(joinPoint));
+        logger.log(Level.INFO, "Query Parameters: " + getQueryParams(request));
+        logger.log(Level.INFO, "Headers: " + getHeaders(request));
+        logger.log(Level.INFO, "Request ID: " + requestId);
+
+        // Log request body if present
+        if (joinPoint.getArgs().length > 0) {
+            logger.log(Level.INFO, "Request Body: " + getRequestBody(joinPoint));
+        }
+        logger.log(Level.INFO, "Response Body: " + formatAsJsonObject(response));
+
     }
+
 
     private String getPathVariables(JoinPoint joinPoint) {
 
@@ -131,5 +151,10 @@ public class LoggerAspect {
         Method method = signature.getMethod();
 
         return method.getParameterAnnotations();
+    }
+
+    private String getUUID() {
+
+        return UUID.randomUUID().toString();
     }
 }
