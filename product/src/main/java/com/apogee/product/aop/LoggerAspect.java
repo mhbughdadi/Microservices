@@ -35,7 +35,6 @@ public class LoggerAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String requestId = getUUID();
 
-        HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(request);
         request.setAttribute("requestId", requestId);
 
         logger.log(Level.INFO, "URL: " + request.getRequestURL());
