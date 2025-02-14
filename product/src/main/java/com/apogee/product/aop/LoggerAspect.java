@@ -1,7 +1,8 @@
 package com.apogee.product.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,8 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import static com.apogee.product.utilities.DateUtilities.getCurrentTimeStamp;
 import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
@@ -26,56 +26,54 @@ import static com.apogee.product.utilities.Utilities.formatAsJsonObject;
 @Component
 public class LoggerAspect {
 
-    Logger logger = Logger.getLogger(LoggerAspect.class.getName());
+    Logger logger = LogManager.getLogger(LoggerAspect.class);
 
     @Before("execution(* com.apogee.product.controllers.ProductController.*(..))")
     void logRequestInformation(JoinPoint joinPoint) {
 
-        logger = Logger.getLogger(joinPoint.getSignature().getDeclaringTypeName());
+        logger = LogManager.getLogger(joinPoint.getSignature().getDeclaringTypeName());
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String requestId = getUUID();
 
         request.setAttribute("requestId", requestId);
 
-        logger.log(Level.INFO, "URL: " + request.getRequestURL());
-        logger.log(Level.INFO, "HTTP Method: " + request.getMethod());
-        logger.log(Level.INFO, "Timestamp: " + getCurrentTimeStamp());
-        logger.log(Level.INFO, "Session ID: " + request.getRequestedSessionId());
-        logger.log(Level.INFO, "Path Variables: " + getPathVariables(joinPoint));
-        logger.log(Level.INFO, "Query Parameters: " + getQueryParams(request));
-        logger.log(Level.INFO, "Headers: " + getHeaders(request));
-        logger.log(Level.INFO, "Request ID: " + requestId);
-
-        // Log request body if present
-        if (joinPoint.getArgs().length > 0) {
-            logger.log(Level.INFO, "Request Body: " + getRequestBody(joinPoint));
-        }
+        logRequestDetails(joinPoint, request, requestId);
 
     }
 
     @AfterReturning(pointcut = "execution(* com.apogee.product.controllers..*(..))", returning = "response")
     public void logResponseDetails(JoinPoint joinPoint, Object response) {
 
-        logger = Logger.getLogger(joinPoint.getSignature().getDeclaringTypeName());
+        logger = LogManager.getLogger(joinPoint.getSignature().getDeclaringTypeName());
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String requestId = (String) request.getAttribute("requestId");
 
-        logger.log(Level.INFO, "URL: " + request.getRequestURL());
-        logger.log(Level.INFO, "HTTP Method: " + request.getMethod());
-        logger.log(Level.INFO, "Timestamp: " + getCurrentTimeStamp());
-        logger.log(Level.INFO, "Session ID: " + request.getRequestedSessionId());
-        logger.log(Level.INFO, "Path Variables: " + getPathVariables(joinPoint));
-        logger.log(Level.INFO, "Query Parameters: " + getQueryParams(request));
-        logger.log(Level.INFO, "Headers: " + getHeaders(request));
-        logger.log(Level.INFO, "Request ID: " + requestId);
+        logRequestAndResponseDetails(joinPoint, response, request, requestId);
+
+    }
+
+    private void logRequestAndResponseDetails(JoinPoint joinPoint, Object response, HttpServletRequest request, String requestId) {
+
+        logRequestDetails(joinPoint, request, requestId);
+        logger.info( "Response Body: {}", formatAsJsonObject(response));
+    }
+
+    private void logRequestDetails(JoinPoint joinPoint, HttpServletRequest request, String requestId) {
+
+        logger.info("URL: {}", request.getRequestURL());
+        logger.info( "HTTP Method: {}", request.getMethod());
+        logger.info( "Timestamp: {}", getCurrentTimeStamp());
+        logger.info( "Session ID: {}", request.getRequestedSessionId());
+        logger.info( "Path Variables: {}", getPathVariables(joinPoint));
+        logger.info( "Query Parameters: {}", getQueryParams(request));
+        logger.info( "Headers: {}", getHeaders(request));
+        logger.info( "Request ID: {}", requestId);
 
         // Log request body if present
         if (joinPoint.getArgs().length > 0) {
-            logger.log(Level.INFO, "Request Body: " + getRequestBody(joinPoint));
+            logger.info( "Request Body: {}", getRequestBody(joinPoint));
         }
-        logger.log(Level.INFO, "Response Body: " + formatAsJsonObject(response));
-
     }
 
 
