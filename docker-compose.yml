@@ -27,14 +27,56 @@ services:
       - "9090:9090"
     depends_on:
       - mysql-db
+      - logstash
     networks:
       - ms-network
       - shared-network          # allow microservices to access the DB
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - elk-network
+      - shared-network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.0
+    container_name: logstash
+    volumes:
+      - ./elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044"   # Beats input or log shipping
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+      - shared-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+      - shared-network
+
 networks:
   db-network:
   ms-network:
+  elk-network:
   shared-network:
 
 volumes:
   mysql_data:
+  elastic_data:
+  
