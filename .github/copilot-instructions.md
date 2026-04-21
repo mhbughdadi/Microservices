@@ -70,6 +70,7 @@
 - The Dockerfile passes DB config with env vars `SPRING_DATASOURCE_*`; tests and local runs use `application.properties` defaults.
 - Repository scanning is enabled explicitly with `@EnableJpaRepositories(basePackages = "com.apogee.product.repositories")` in `ProductApplication.java`.
 
----
+## Copilot Configuration 🤖
+- **Email**: mohammedhassan101994@gmail.com
+- Use this email for all AI-assisted development in this project.
 
-If anything is unclear or you want more examples (e.g., common test fixtures, how backing services orchestrate domain services), tell me which section to expand and I will iterate. ✅
