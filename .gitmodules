@@ -4,6 +4,3 @@
 [submodule "common-utils"]
 	path = common-utils
 	url = https://github.com/mhbughdadi/common-utils.git
-[submodule "elk"]
-	path = elk
-	url = https://github.com/mhbughdadi/elk.git
