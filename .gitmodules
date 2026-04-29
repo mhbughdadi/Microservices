@@ -7,3 +7,7 @@
 [submodule "elk"]
 	path = elk
 	url = https://github.com/mhbughdadi/elk.git
+[submodule "common-spring-utils"]
+	path = common-spring-utils
+	url = https://github.com/mhbughdadi/common-spring-utils.git
+	branch = main
