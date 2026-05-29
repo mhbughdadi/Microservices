@@ -14,6 +14,12 @@ services:
     networks:
       - db-network
       - shared-network          # allow microservices to connect to the DB
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   sonar-db:
     image: postgres:15
@@ -28,6 +34,12 @@ services:
     networks:
       - sonar-network
       - shared-network          # allow SonarQube to access the DB
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
   
   sonarqube:
     image: sonarqube:lts
@@ -54,16 +66,28 @@ services:
     build:
       context: ./products-ms
       dockerfile: DockerFile
+
+      args:
+        NEXUS_URL: http://host.docker.internal:8081/repository/maven-public/
+        NEXUS_USERNAME: admin
+        NEXUS_PASSWORD: Nexus@2026
+
     container_name: products-ms
+
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/products_ms_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword
+    
     ports:
       - "9090:9090"
     depends_on:
-      - mysql-db
-      - logstash
+      mysql-db:
+        condition: service_healthy
+      logstash:
+        condition: service_healthy
+      nexus:
+        condition: service_healthy
     networks:
       - ms-network
       - shared-network          # allow microservices to access the DB
@@ -81,6 +105,12 @@ services:
     networks:
       - elk-network
       - shared-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf http://localhost:9200/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.13.0
@@ -94,6 +124,15 @@ services:
     networks:
       - elk-network
       - shared-network
+    # Logstash does not expose a single robust HTTP readiness probe by default;
+    # we add a lightweight check that the pipeline file is present to reduce
+    # race conditions where the container starts but file mounts are not ready.
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /usr/share/logstash/pipeline/logstash.conf || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.0
@@ -105,6 +144,28 @@ services:
     networks:
       - elk-network
       - shared-network
+  
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    environment:
+      INSTALL4J_ADD_VM_PARAMS: >
+        -Xms1g
+        -Xmx1g
+        -XX:MaxDirectMemorySize=2g
+    networks:
+      - shared-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/ || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 120s
 
 networks:
   db-network:
@@ -121,4 +182,5 @@ volumes:
   sonarqube_logs:
   postgresql:
   postgresql_data:
+  nexus-data:
   
