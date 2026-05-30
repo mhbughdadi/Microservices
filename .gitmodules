@@ -11,6 +11,6 @@
 	path = common-spring-utils
 	url = https://github.com/mhbughdadi/common-spring-utils.git
 	branch = main
-[submodule "prices-ms"]
-	path = prices-ms
-	url = https://github.com/mhbughdadi/prices-ms.git
+[submodule "pricing-ms"]
+	path = pricing-ms
+	url = https://github.com/mhbughdadi/pricing-ms.git
