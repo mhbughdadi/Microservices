@@ -90,7 +90,8 @@ services:
         condition: service_healthy
     networks:
       - ms-network
-      - shared-network          # allow microservices to access the DB
+      - db-network              # allow microservices to access the DB
+      - shared-network          
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
@@ -166,11 +167,65 @@ services:
       timeout: 10s
       retries: 20
       start_period: 120s
+  
+  pricing-db:
+    image: postgres:16
+    container_name: pricing-db
+    environment:
+      POSTGRES_USER: pricing_user
+      POSTGRES_PASSWORD: pricing_password
+      POSTGRES_DB: pricing_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pricing-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - pricing-network 
+      - shared-network        
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "pricing_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+  
+  pricing-ms:
+    build:
+      context: ./pricing-ms
+      dockerfile: DockerFile
+
+      args:
+        NEXUS_URL: http://host.docker.internal:8081/repository/maven-public/
+        NEXUS_USERNAME: admin
+        NEXUS_PASSWORD: Nexus@2026
+
+    container_name: pricing-ms
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pricing-db:5432/pricing_db
+      SPRING_DATASOURCE_USERNAME: pricing_user
+      SPRING_DATASOURCE_PASSWORD: pricing_password
+    
+    ports:
+      - "9092:9092"
+    depends_on:
+      pricing-db:
+        condition: service_healthy
+      logstash:
+        condition: service_healthy
+      nexus:
+        condition: service_healthy
+    networks:
+      - ms-network
+      - pricing-network              # allow microservices to access the DB
+      - shared-network          
 
 networks:
   db-network:
   ms-network:
   elk-network:
+  pricing-network:
   shared-network:
   sonar-network:
 
@@ -183,4 +238,5 @@ volumes:
   postgresql:
   postgresql_data:
   nexus-data:
+  pricing-db-data:
   
